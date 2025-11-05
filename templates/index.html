@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold text-green-700 text-center mb-6">Welcome to SymptoCare</h2>
+
+<p class="text-gray-600 text-center mb-6">
+  Your AI-powered health assistant to predict diseases, find hospitals, pharmacies, and get real medical precautions.
+</p>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
+  <a href="/predict" class="bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition">🩺 Disease Predictor</a>
+  <a href="/hospitals" class="bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition">🏥 Find Hospitals</a>
+  <a href="/shops" class="bg-purple-500 text-white py-3 rounded-lg hover:bg-purple-600 transition">💊 Medical Shops</a>
+  <a href="/precautions" class="bg-yellow-500 text-white py-3 rounded-lg hover:bg-yellow-600 transition">🧠 Precautions</a>
+</div>
+
+{% endblock %}

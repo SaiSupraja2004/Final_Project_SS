@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-2xl font-bold text-green-700 mb-4 text-center">Find Nearby Medical Shops</h2>
+
+<div class="flex gap-2 mb-4">
+  <input id="cityShop" class="flex-1 p-3 border rounded-lg" placeholder="Enter city name">
+  <button id="shopBtn" class="bg-blue-500 text-white px-4 rounded-lg">Search</button>
+</div>
+
+<ul id="shopList" class="list-disc pl-5 text-gray-700"></ul>
+
+<!-- 🗺️ Map Section -->
+<div id="shopMap" class="w-full h-96 mt-6 rounded-xl shadow-lg border"></div>
+
+<!-- ✅ Include Leaflet -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // ---- Map setup ----
+  let map = L.map("shopMap").setView([20.5937, 78.9629], 5); // India default
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap contributors",
+  }).addTo(map);
+  let markers = [];
+
+  // ---- Event Listener ----
+  document.getElementById("shopBtn").addEventListener("click", async () => {
+    const city = document.getElementById("cityShop").value.trim();
+    const shopList = document.getElementById("shopList");
+    shopList.innerHTML = "";
+
+    if (!city) {
+      shopList.innerHTML = "<li class='text-red-600'>Please enter a city.</li>";
+      return;
+    }
+
+    shopList.innerHTML = "<li>Loading medical shops...</li>";
+
+    try {
+      const res = await fetch(`/find-medicalshops?city=${encodeURIComponent(city)}`);
+      const data = await res.json();
+
+      if (data.error) {
+        shopList.innerHTML = `<li class='text-red-600'>${data.error}</li>`;
+        return;
+      }
+
+      const shops = data.results || [];
+
+      if (shops.length === 0) {
+        shopList.innerHTML = "<li>No medical shops found.</li>";
+        return;
+      }
+
+      shopList.innerHTML = "";
+      // Clear map markers
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+
+      const bounds = [];
+
+      shops.forEach(s => {
+        const li = document.createElement("li");
+        li.textContent = `${s.name} (${s.lat}, ${s.lon})`;
+        shopList.appendChild(li);
+
+        if (s.lat && s.lon) {
+          const marker = L.marker([s.lat, s.lon]).addTo(map);
+          marker.bindPopup(`<b>${s.name}</b><br>
+            <a href="https://www.google.com/maps?q=${s.lat},${s.lon}" target="_blank">
+              📍 Open in Google Maps
+            </a>`);
+          markers.push(marker);
+          bounds.push([s.lat, s.lon]);
+        }
+      });
+
+      if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [40, 40] });
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+      shopList.innerHTML = "<li class='text-red-600'>Failed to load medical shop data.</li>";
+    }
+  });
+});
+</script>
+{% endblock %}

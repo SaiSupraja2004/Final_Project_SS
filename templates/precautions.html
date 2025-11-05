@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-2xl font-bold text-green-700 mb-4 text-center">Precaution Advice</h2>
+
+<div class="flex gap-2 mb-4">
+  <input id="diseaseInput" class="flex-1 p-3 border rounded-lg" placeholder="Enter disease name">
+  <button id="precBtn" class="bg-blue-500 text-white px-4 rounded-lg">Get Advice</button>
+  <button id="speakOut" class="bg-green-500 text-white px-4 rounded-lg">🔊 Speak</button>
+</div>
+
+<div id="precResult" class="text-center text-gray-700 mt-4"></div>
+{% endblock %}

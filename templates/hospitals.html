@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-2xl font-bold text-green-700 mb-4 text-center">Find Nearby Hospitals</h2>
+
+<div class="flex gap-2 mb-4">
+  <input id="cityHosp" class="flex-1 p-3 border rounded-lg" placeholder="Enter city name">
+  <button id="hospBtn" class="bg-blue-500 text-white px-4 rounded-lg">Search</button>
+</div>
+
+<ul id="hospList" class="list-disc pl-5 text-gray-700"></ul>
+
+<!-- 🌍 Map Section -->
+<div id="map" class="w-full h-96 mt-6 rounded-xl shadow-lg border"></div>
+
+<!-- ✅ Include Leaflet -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // ---- Map setup ----
+  let map = L.map("map").setView([20.5937, 78.9629], 5); // India default
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap contributors",
+  }).addTo(map);
+  let markers = [];
+
+  // ---- Event Listener ----
+  document.getElementById("hospBtn").addEventListener("click", async () => {
+    const city = document.getElementById("cityHosp").value.trim();
+    const hospList = document.getElementById("hospList");
+    hospList.innerHTML = "";
+
+    if (!city) {
+      hospList.innerHTML = "<li class='text-red-600'>Please enter a city.</li>";
+      return;
+    }
+
+    hospList.innerHTML = "<li>Loading hospitals...</li>";
+
+    try {
+      const res = await fetch(`/find-hospitals?city=${encodeURIComponent(city)}`);
+      const data = await res.json();
+
+      if (data.error) {
+        hospList.innerHTML = `<li class='text-red-600'>${data.error}</li>`;
+        return;
+      }
+
+      const hospitals = data.results || [];
+
+      if (hospitals.length === 0) {
+        hospList.innerHTML = "<li>No hospitals found.</li>";
+        return;
+      }
+
+      hospList.innerHTML = "";
+      // Clear map markers
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+
+      const bounds = [];
+
+      hospitals.forEach(h => {
+        const li = document.createElement("li");
+        li.textContent = `${h.name} (${h.lat}, ${h.lon})`;
+        hospList.appendChild(li);
+
+        if (h.lat && h.lon) {
+          const marker = L.marker([h.lat, h.lon]).addTo(map);
+          marker.bindPopup(`<b>${h.name}</b><br>
+            <a href="https://www.google.com/maps?q=${h.lat},${h.lon}" target="_blank">
+              📍 Open in Google Maps
+            </a>`);
+          markers.push(marker);
+          bounds.push([h.lat, h.lon]);
+        }
+      });
+
+      if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [40, 40] });
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+      hospList.innerHTML = "<li class='text-red-600'>Failed to load hospital data.</li>";
+    }
+  });
+});
+</script>
+{% endblock %}

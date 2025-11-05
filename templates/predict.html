@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-2xl font-bold text-green-700 mb-4 text-center">Disease Prediction</h2>
+
+<div class="flex gap-2 mb-4">
+  <input id="symptoms" class="flex-1 p-3 border rounded-lg" placeholder="Type symptoms like fever,cold">
+  <button id="voiceInput" class="bg-green-500 text-white px-4 rounded-lg">🎤 Speak</button>
+  <button id="predictBtn" class="bg-blue-500 text-white px-4 rounded-lg">Predict</button>
+</div>
+
+<div id="predictionResult" class="text-center text-lg text-gray-700 mt-3"></div>
+{% endblock %}

@@ -1,0 +1,28 @@
+<!-- base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SymptoCare</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+  <nav class="bg-green-600 text-white p-4 flex justify-center gap-6 font-semibold">
+    <a href="/" class="hover:text-gray-200">Home</a>
+    <a href="/predict" class="hover:text-gray-200">Disease Predictor</a>
+    <a href="/hospitals" class="hover:text-gray-200">Hospitals</a>
+    <a href="/shops" class="hover:text-gray-200">Medical Shops</a>
+    <a href="/precautions" class="hover:text-gray-200">Precautions</a>
+  </nav>
+
+  <div class="p-6 max-w-3xl mx-auto bg-white shadow-lg mt-6 rounded-xl">
+    {% block content %}{% endblock %}
+  </div>
+
+  <!-- ✅ Load JS at bottom -->
+  
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
